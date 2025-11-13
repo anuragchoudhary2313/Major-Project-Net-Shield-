@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-{
-  "name": "vite-react-typescript-starter",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-=======
-﻿
 {
   "name": "major-project-net-shield-iicm",
   "private": true,
@@ -18,7 +7,6 @@
     "dev": "vite",
     "build": "npx vite build",
     "prebuild": "chmod +x ./node_modules/.bin/vite || true",
->>>>>>> 724a4b725d45f12383df23fb1e8279890f8bbccc
     "lint": "eslint .",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.app.json"
@@ -30,10 +18,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
-<<<<<<< HEAD
-=======
     "@babel/core": "^7.28.5",
->>>>>>> 724a4b725d45f12383df23fb1e8279890f8bbccc
     "@eslint/js": "^9.9.1",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
@@ -43,24 +28,14 @@
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.11",
     "globals": "^15.9.0",
-<<<<<<< HEAD
-=======
     "gh-pages": "^6.3.0",
->>>>>>> 724a4b725d45f12383df23fb1e8279890f8bbccc
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.3.0",
-<<<<<<< HEAD
-    "vite": "^5.4.2"
-  }
-}
-=======
     "vite": "^5.4.21"
   },
   "engines": {
     "node": "22.x"
   }
 }
-
->>>>>>> 724a4b725d45f12383df23fb1e8279890f8bbccc
