@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 194a2bf62c7a4d140fa4a2d5580e5acf6d6add64
 # Net Shield - Network Security Analyzer
 
 A comprehensive network security analyzer that monitors, detects, and reports malicious or suspicious network activity in real-time. Built with React, Supabase, and Python.
@@ -328,3 +332,9 @@ When contributing:
 ---
 
 Built with React, Supabase, and Python for comprehensive network security monitoring.
+<<<<<<< HEAD
+=======
+=======
+# Minor-Project
+>>>>>>> 963339ba749ec111174b38385d6d81af846b80b0
+>>>>>>> 194a2bf62c7a4d140fa4a2d5580e5acf6d6add64
