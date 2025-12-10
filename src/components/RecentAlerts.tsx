@@ -1,6 +1,6 @@
 import React from 'react';
 import { AlertTriangle, Clock } from 'lucide-react';
-import { Alert } from '../lib/supabase';
+import { Alert } from '../lib/api';
 
 interface RecentAlertsProps {
   alerts: Alert[];

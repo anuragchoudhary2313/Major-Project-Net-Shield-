@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Activity, AlertTriangle, Shield, TrendingUp } from 'lucide-react';
-import { supabase, Alert, PacketLog } from '../lib/supabase';
+import { api, Alert, PacketLog } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import { NetworkTrafficChart } from '../components/NetworkTrafficChart';
 import { RecentAlerts } from '../components/RecentAlerts';
@@ -17,67 +17,37 @@ export const Dashboard: React.FC = () => {
   const [trafficData, setTrafficData] = useState<PacketLog[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (user) {
-      fetchDashboardData();
-
-      const alertsSubscription = supabase
-        .channel('alerts_changes')
-        .on('postgres_changes',
-          { event: '*', schema: 'public', table: 'alerts' },
-          () => {
-            fetchDashboardData();
-          }
-        )
-        .subscribe();
-
-      const logsSubscription = supabase
-        .channel('logs_changes')
-        .on('postgres_changes',
-          { event: '*', schema: 'public', table: 'packet_logs' },
-          () => {
-            fetchDashboardData();
-          }
-        )
-        .subscribe();
-
-      return () => {
-        alertsSubscription.unsubscribe();
-        logsSubscription.unsubscribe();
-      };
-    }
-  }, [user]);
-
   const fetchDashboardData = async () => {
     try {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      const [packetsResult, alertsResult, todayPacketsResult, trafficResult] = await Promise.all([
-        supabase.from('packet_logs').select('id', { count: 'exact', head: true }),
-        supabase.from('alerts').select('*').eq('status', 'unresolved').order('timestamp', { ascending: false }),
-        supabase.from('packet_logs').select('id', { count: 'exact', head: true }).gte('timestamp', today.toISOString()),
-        supabase.from('packet_logs').select('*').order('timestamp', { ascending: false }).limit(50),
-      ]);
-
-      const alerts = alertsResult.data || [];
-      const criticalCount = alerts.filter((a) => a.severity === 'critical' || a.severity === 'high').length;
-
+      const { data } = await api.get('/api/dashboard');
       setStats({
-        totalPackets: packetsResult.count || 0,
-        activeAlerts: alerts.length,
-        threatLevel: criticalCount > 0 ? 'high' : alerts.length > 5 ? 'medium' : 'low',
-        packetsToday: todayPacketsResult.count || 0,
+        totalPackets: data.totalPackets,
+        activeAlerts: data.activeAlerts,
+        threatLevel: data.threatLevel,
+        packetsToday: data.packetsToday,
       });
-
-      setRecentAlerts(alerts.slice(0, 5));
-      setTrafficData(trafficResult.data || []);
+      // The backend now returns 50 logs, we pass them to the chart
+      setTrafficData(data.recentTraffic || []);
+      
+      // We need to fetch alerts separately for the list or include them in the dashboard endpoint
+      // For simplicity, let's assume we fetch recent alerts separately
+      const alertsRes = await api.get('/api/alerts');
+      setRecentAlerts(alertsRes.data.slice(0, 5));
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      fetchDashboardData();
+      // Poll every 5 seconds instead of real-time socket for simplicity
+      const interval = setInterval(fetchDashboardData, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [user]);
 
   const threatLevelConfig = {
     low: { bg: 'bg-emerald-500', text: 'text-emerald-500', label: 'Low' },

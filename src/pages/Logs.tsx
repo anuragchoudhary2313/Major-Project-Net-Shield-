@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Filter, Download, FileText } from 'lucide-react';
-import { supabase, PacketLog } from '../lib/supabase';
+import { Search, Download } from 'lucide-react';
+import { api, PacketLog } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 
 export const Logs: React.FC = () => {
@@ -17,20 +17,6 @@ export const Logs: React.FC = () => {
   useEffect(() => {
     if (user) {
       fetchLogs();
-
-      const subscription = supabase
-        .channel('logs_realtime')
-        .on('postgres_changes',
-          { event: '*', schema: 'public', table: 'packet_logs' },
-          () => {
-            fetchLogs();
-          }
-        )
-        .subscribe();
-
-      return () => {
-        subscription.unsubscribe();
-      };
     }
   }, [user]);
 
@@ -40,13 +26,7 @@ export const Logs: React.FC = () => {
 
   const fetchLogs = async () => {
     try {
-      const { data, error } = await supabase
-        .from('packet_logs')
-        .select('*')
-        .order('timestamp', { ascending: false })
-        .limit(1000);
-
-      if (error) throw error;
+      const { data } = await api.get('/api/logs');
       setLogs(data || []);
     } catch (error) {
       console.error('Error fetching logs:', error);
@@ -57,7 +37,6 @@ export const Logs: React.FC = () => {
 
   const filterLogs = () => {
     let filtered = logs;
-
     if (searchTerm) {
       filtered = filtered.filter((log) =>
         log.src_ip.includes(searchTerm) ||
@@ -65,26 +44,18 @@ export const Logs: React.FC = () => {
         log.protocol.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-
     if (statusFilter !== 'all') {
       filtered = filtered.filter((log) => log.status === statusFilter);
     }
-
     if (protocolFilter !== 'all') {
       filtered = filtered.filter((log) => log.protocol === protocolFilter);
     }
-
     setFilteredLogs(filtered);
     setCurrentPage(1);
   };
 
   const protocols = Array.from(new Set(logs.map((log) => log.protocol)));
-
-  const paginatedLogs = filteredLogs.slice(
-    (currentPage - 1) * logsPerPage,
-    currentPage * logsPerPage
-  );
-
+  const paginatedLogs = filteredLogs.slice((currentPage - 1) * logsPerPage, currentPage * logsPerPage);
   const totalPages = Math.ceil(filteredLogs.length / logsPerPage);
 
   const statusConfig = {
@@ -104,9 +75,7 @@ export const Logs: React.FC = () => {
         log.packet_size.toString(),
         log.status,
       ]),
-    ]
-      .map((row) => row.join(','))
-      .join('\n');
+    ].map((row) => row.join(',')).join('\n');
 
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -131,10 +100,7 @@ export const Logs: React.FC = () => {
           <h1 className="text-3xl font-bold text-white">Packet Logs</h1>
           <p className="text-slate-400 mt-1">View and analyze captured network packets</p>
         </div>
-        <button
-          onClick={exportLogs}
-          className="flex items-center space-x-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-all"
-        >
+        <button onClick={exportLogs} className="flex items-center space-x-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-all">
           <Download className="w-4 h-4" />
           <span>Export CSV</span>
         </button>
@@ -145,45 +111,19 @@ export const Logs: React.FC = () => {
           <div className="md:col-span-2">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search by IP or protocol..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              />
+              <input type="text" placeholder="Search by IP or protocol..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
             </div>
           </div>
-
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-          >
+          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
             <option value="all">All Status</option>
             <option value="normal">Normal</option>
             <option value="suspicious">Suspicious</option>
             <option value="malicious">Malicious</option>
           </select>
-
-          <select
-            value={protocolFilter}
-            onChange={(e) => setProtocolFilter(e.target.value)}
-            className="px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-          >
+          <select value={protocolFilter} onChange={(e) => setProtocolFilter(e.target.value)} className="px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
             <option value="all">All Protocols</option>
-            {protocols.map((protocol) => (
-              <option key={protocol} value={protocol}>
-                {protocol}
-              </option>
-            ))}
+            {protocols.map((protocol) => <option key={protocol} value={protocol}>{protocol}</option>)}
           </select>
-        </div>
-
-        <div className="mb-4 flex items-center justify-between text-sm text-slate-400">
-          <span>
-            Showing {paginatedLogs.length} of {filteredLogs.length} logs
-          </span>
         </div>
 
         <div className="overflow-x-auto">
@@ -203,46 +143,18 @@ export const Logs: React.FC = () => {
                 const config = statusConfig[log.status];
                 return (
                   <tr key={log.id} className="border-b border-slate-700/50 hover:bg-slate-700/30 transition-colors">
-                    <td className="py-3 px-4 text-sm text-slate-400">
-                      {new Date(log.timestamp).toLocaleString()}
-                    </td>
+                    <td className="py-3 px-4 text-sm text-slate-400">{new Date(log.timestamp).toLocaleString()}</td>
                     <td className="py-3 px-4 text-sm font-mono text-slate-300">{log.src_ip}</td>
                     <td className="py-3 px-4 text-sm font-mono text-slate-300">{log.dest_ip}</td>
                     <td className="py-3 px-4 text-sm text-slate-300">{log.protocol}</td>
                     <td className="py-3 px-4 text-sm text-slate-300">{log.packet_size} B</td>
-                    <td className="py-3 px-4">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${config.bg} ${config.text}`}>
-                        {config.label}
-                      </span>
-                    </td>
+                    <td className="py-3 px-4"><span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${config.bg} ${config.text}`}>{config.label}</span></td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
         </div>
-
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center space-x-2 mt-6">
-            <button
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-              className="px-4 py-2 bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 text-white rounded-lg transition-all"
-            >
-              Previous
-            </button>
-            <span className="text-slate-400">
-              Page {currentPage} of {totalPages}
-            </span>
-            <button
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
-              className="px-4 py-2 bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 text-white rounded-lg transition-all"
-            >
-              Next
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
