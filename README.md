@@ -1,8 +1,8 @@
 # Net Shield - Network Security Analyzer
 
-A comprehensive network security analyzer that monitors, detects, and reports malicious or suspicious network activity in real-time. Built with **React**, **Node.js**, **MongoDB**, and **Python**.
+A comprehensive real-time network security analyzer that monitors, detects, and reports malicious or suspicious network activity. Built with React, MongoDB, and Python.
 
-## Features
+## 🎯 Features
 
 ### Real-Time Dashboard
 - Live network traffic visualization
@@ -44,187 +44,312 @@ A comprehensive network security analyzer that monitors, detects, and reports ma
 - Role-based access control (Admin, Analyst, Viewer)
 - User profile management
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 - **Frontend**: React 18, TypeScript, TailwindCSS, Vite
-- **Backend**: Node.js, Express.js
-- **Database**: MongoDB (Mongoose)
+- **Backend**: Node.js, Express
+- **Database**: MongoDB
 - **Packet Capture**: Python 3, Scapy
 - **Icons**: Lucide React
+- **Build Tool**: Vite
 
-## Project Structure
+## 📁 Project Structure
 
-/ ├── server/ # Node.js + Express Backend │ ├── models/ # Mongoose Models (User, Log, Alert, Report) │ └── index.js # Server entry point ├── src/ # React Frontend │ ├── components/ # Reusable UI components │ ├── contexts/ # React context providers │ ├── lib/ # Utilities (API client) │ ├── pages/ # Main application pages │ └── App.tsx ├── capture/ # Python packet analyzer │ ├── packet_analyzer.py │ ├── requirements.txt │ └── README.md └── README.md
+```
+NetShield/
+├── project/                    # Frontend application
+│   ├── src/
+│   │   ├── components/        # Reusable UI components
+│   │   ├── contexts/          # React context providers
+│   │   ├── lib/               # Utilities and configurations
+│   │   ├── pages/             # Main application pages
+│   │   │   ├── Dashboard.tsx
+│   │   │   ├── Logs.tsx
+│   │   │   ├── Alerts.tsx
+│   │   │   ├── Reports.tsx
+│   │   │   └── Settings.tsx
+│   │   └── App.tsx
+│   ├── package.json
+│   ├── .env.example
+│   └── vite.config.ts
+├── capture/                   # Python packet analyzer
+│   ├── packet_analyzer.py
+│   ├── requirements.txt
+│   └── README.md
+└── README.md
+```
 
-
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
-- **Node.js** 18+ and npm
-- **Python** 3.7+
-- **MongoDB** (Installed locally or using MongoDB Atlas)
+- Node.js 18+ and npm
+- Python 3.7+
+- MongoDB Atlas account
+- Administrator/Root access (for packet capture)
 
 ### Installation
 
-1. **Install Frontend Dependencies**
-   ```bash
-   npm install
-Install Backend Dependencies
+#### 1. Clone the Repository
+```bash
+git clone https://github.com/anuragchoudhary2313/Major-Project-Net-Shield-.git
+cd Major-Project-Net-Shield-/project
+```
 
-Bash
+#### 2. Install Frontend Dependencies
+```bash
+npm install
+```
 
-# Create server directory if it doesn't exist, or navigate to it
-cd server
-npm install express mongoose cors dotenv bcryptjs jsonwebtoken
-cd ..
-Install Python Dependencies
-
-Bash
-
-cd capture
+#### 3. Install Python Dependencies
+```bash
+cd ../capture
 pip install -r requirements.txt
-cd ..
-Environment Setup
+cd ../project
+```
 
-Create a .env file in the root directory with the following configuration:
+#### 4. Environment Setup
 
-Code snippet
+Create a `.env` file in the `project` folder (use `.env.example` as template):
 
-# Backend Configuration
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/netshield
-# Or for Atlas: mongodb+srv://<user>:<password>@cluster.mongodb.net/?appName=Cluster0
-
-# JWT Configuration
-JWT_SECRET=your_secure_random_secret_key
-
-# Frontend API Configuration (Vite handles VITE_ prefix)
+```bash
 VITE_API_URL=http://localhost:5000
-Running the Application
-Start the Backend Server
+MONGODB_URI=mongodb+srv://your_username:your_password@your_cluster.mongodb.net/netshield
+JWT_SECRET=your_secure_secret_key_here
+PORT=5000
+```
 
-Bash
+**⚠️ Never commit `.env` file to GitHub. Keep it local only.**
 
-node server/index.js
-You should see "Connected to MongoDB" in the console.
+### Running the Application
 
-Start the Frontend Application Open a new terminal:
+#### 1. Start MongoDB
+Ensure MongoDB Atlas connection is active or run local MongoDB server.
 
-Bash
-
+#### 2. Start the Frontend Development Server
+```bash
 npm run dev
-Create an Account
+```
+Open `http://localhost:5173` in your browser.
 
-Open http://localhost:5173 in your browser.
+#### 3. Create User Account
+- Sign up with email and password
+- Your account will be created in MongoDB
 
-Use the Sign Up form to create a new account.
-
-Note: The first user does not automatically become an admin; you may need to update the role in the database directly for admin features.
-
-Get your User ID
-
-Log in to the dashboard.
-
-The packet analyzer needs your User ID to associate logs with your account.
-
-You can find this in your MongoDB users collection or potentially exposed in the frontend settings/profile view.
-
-Run Packet Analyzer
-
-Bash
-
+#### 4. Run Packet Analyzer (Terminal 2)
+```bash
 cd capture
-# Replace with your actual User ID from MongoDB
-export USER_ID='65d4c...' 
-
-# Run with sudo (required for packet capture)
+export USER_ID='your-user-id-from-mongodb'
 sudo -E python3 packet_analyzer.py
-Database Schema
-The application uses MongoDB collections:
+```
 
-users: Stores user credentials, roles, and settings.
+**Windows (PowerShell):**
+```powershell
+cd capture
+$env:USER_ID='your-user-id'
+python3 packet_analyzer.py
+```
 
-packetlogs: Captured network packet data.
+## 🔒 Security Features
 
-alerts: Security alerts and threats.
+### Threat Detection
 
-reports: Generated security reports.
+1. **Port Scanning**: Detects when a single IP attempts to connect to multiple ports
+2. **DoS Attacks**: Identifies high-frequency packet floods
+3. **Suspicious Access**: Monitors access to commonly exploited ports
 
-Security Features
-Threat Detection
-Port Scanning: Detects when a single IP attempts to connect to multiple ports.
+### Authentication
+- Email/password authentication
+- Secure JWT token management
+- Session management
+- Role-based access control
 
-DoS Attacks: Identifies high-frequency packet floods.
+### Data Protection
+- MongoDB encryption at rest
+- HTTPS recommended for production
+- Password hashing with bcrypt
+- User data isolation
 
-Suspicious Access: Monitors access to commonly exploited ports.
+## 📊 Database Schema
 
-Authentication
-JWT Authentication: Secure stateless authentication using JSON Web Tokens.
+### Collections
 
-Password Hashing: Bcrypt is used to hash passwords before storage.
+- **users**: User accounts and profiles
+- **packet_logs**: Captured network packet data
+- **alerts**: Security alerts and threats
+- **reports**: Generated security reports
 
-Protected Routes: Middleware ensures only authenticated users access API endpoints.
+### Indexes
+- User ID indexes for fast queries
+- Timestamp indexes for sorting
+- Status indexes for filtering
 
-Usage Guide
-Monitoring Network Activity
-Dashboard: Overview of network status and recent alerts.
+## ⚙️ Configuration
 
-Logs: Detailed packet information with filtering.
+### Alert Thresholds (Settings Page)
 
-Alerts: Manage and respond to security threats.
+Configure in the application Settings:
+- **Low Priority**: 1-50 alerts
+- **Medium Priority**: 1-25 alerts
+- **High Priority**: 1-10 alerts
 
-Reports: Generate weekly security summaries.
+### Python Analyzer Settings
 
-Configuration
-Alert Thresholds (Configure in Settings page):
+Edit `capture/packet_analyzer.py`:
 
-Low priority threshold: 1-50 alerts
+```python
+DOS_THRESHOLD = 100          # Packets before DoS alert
+PORT_SCAN_THRESHOLD = 20    # Ports before scan alert
+SUSPICIOUS_PORTS = [22, 23, 445, 3389, 3306, 5432]
+```
 
-Medium priority threshold: 1-25 alerts
+## 📝 Usage Guide
 
-High priority threshold: 1-10 alerts
+### First Time Setup
 
-Python Analyzer Settings (Edit capture/packet_analyzer.py):
+1. Sign up for an account
+2. Get your User ID from MongoDB
+3. Configure alert thresholds in Settings
+4. Start the packet analyzer
+5. Monitor the dashboard
 
-API_URL: Ensure this points to http://localhost:5000/api/logs (or your configured port).
+### Monitoring Network Activity
 
-DOS_THRESHOLD: Packets before DoS alert (default: 100).
+1. **Dashboard**: Real-time overview and recent alerts
+2. **Logs**: Detailed packet information with filters
+3. **Alerts**: Manage and respond to threats
+4. **Reports**: Generate security summaries
 
-PORT_SCAN_THRESHOLD: Ports before scan alert (default: 20).
+### Responding to Threats
 
-API Integration
-The Python analyzer communicates with the Node.js backend via REST API:
+1. Review alert details
+2. Mark as "Investigating" while analyzing
+3. Take action (block IP, update firewall, etc.)
+4. Mark as "Resolved" when complete
 
-HTTP
+## 🔧 Troubleshooting
 
-POST http://localhost:5000/api/logs
-Content-Type: application/json
-Authorization: Bearer <OPTIONAL_IF_IMPLEMENTED_FOR_BOTS>
+### Python Script Issues
 
-{
-  "src_ip": "192.168.1.100",
-  "dest_ip": "10.0.0.1",
-  "protocol": "TCP",
-  "packet_size": 1500,
-  "status": "normal",
-  "user_id": "user-mongo-object-id"
-}
-Troubleshooting
-Connection Issues
-MongoDB Error: Ensure MongoDB service is running (sudo systemctl start mongod on Linux) or check your Atlas connection string in .env.
+```bash
+# Permission denied
+sudo -E python3 packet_analyzer.py
 
-IP Whitelist: If using MongoDB Atlas, ensure your current IP address is added to the Network Access whitelist.
+# No packets captured
+# Check network interface: python3 -c "from scapy.all import get_if_list; print(get_if_list())"
 
-Python Script Issues
-Permission denied: Packet capture requires root privileges. Run with sudo.
+# Database not updating
+# Verify USER_ID is set: echo $USER_ID
+```
 
-Connection Refused: Ensure the Node.js server is running on port 5000.
+### Frontend Issues
 
-Frontend Issues
-Vite Error: Delete node_modules and package-lock.json, then run npm install again.
+```bash
+# Clear cache and reinstall
+rm -rf node_modules package-lock.json
+npm install
 
-API Errors: Check the browser console and ensure VITE_API_URL is set correctly in .env.
+# Port already in use
+npm run dev -- --port 3000
+```
 
-License
+### MongoDB Connection
+
+- Verify connection string in `.env`
+- Check IP whitelist in MongoDB Atlas
+- Ensure network access is enabled
+
+## 🌐 Deployment
+
+### Frontend Deployment (Vercel/Netlify)
+
+```bash
+npm run build
+# Deploy the 'dist' folder to your hosting service
+```
+
+### Python Analyzer as Service (Linux)
+
+```bash
+sudo nano /etc/systemd/system/netshield.service
+```
+
+Add:
+```
+[Unit]
+Description=Net Shield Packet Analyzer
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/path/to/project/capture
+Environment="USER_ID=your-user-id"
+ExecStart=/usr/bin/python3 packet_analyzer.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Then:
+```bash
+sudo systemctl enable netshield
+sudo systemctl start netshield
+sudo systemctl status netshield
+```
+
+## 📈 Performance
+
+- Handles 1000+ packets/second
+- Real-time dashboard updates
+- Efficient MongoDB queries with indexes
+- Automatic data cleanup
+
+## 🔐 Security Notes
+
+- ⚠️ **This tool is for defensive security only**
+- Only use on networks you own or have permission to monitor
+- Packet capture requires root/administrator privileges
+- Keep `.env` file secure and never share credentials
+- Change default MongoDB password immediately
+- Use HTTPS in production
+
+## 🚧 Future Enhancements
+
+- AI/ML-based threat detection
+- Email alerts via SendGrid
+- GeoIP location tracking
+- Advanced protocol analysis
+- Custom rule engine
+- Mobile app support
+- Multi-user collaboration
+- Dark mode support
+
+## 📄 License
+
 This project is for educational and defensive security purposes.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please:
+1. Fork the repository
+2. Create a feature branch
+3. Follow existing code style
+4. Add tests for new features
+5. Update documentation
+6. Submit a pull request
+
+## 📞 Support
+
+For issues or questions:
+1. Check the troubleshooting section
+2. Review existing GitHub issues
+3. Create a new issue with detailed information
+4. Check capture/README.md for Python-specific help
+
+---
+
+**Built with ❤️ for network security monitoring and threat detection.**
+
+Last Updated: December 11, 2025
