@@ -1,13 +1,6 @@
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 194a2bf62c7a4d140fa4a2d5580e5acf6d6add64
->>>>>>> 724a4b725d45f12383df23fb1e8279890f8bbccc
 # Net Shield - Network Security Analyzer
 
-A comprehensive network security analyzer that monitors, detects, and reports malicious or suspicious network activity in real-time. Built with React, Supabase, and Python.
+A comprehensive network security analyzer that monitors, detects, and reports malicious or suspicious network activity in real-time. Built with **React**, **Node.js**, **MongoDB**, and **Python**.
 
 ## Features
 
@@ -53,176 +46,161 @@ A comprehensive network security analyzer that monitors, detects, and reports ma
 
 ## Tech Stack
 
-- **Frontend**: React 18, TypeScript, TailwindCSS
-- **Backend/Database**: Supabase (PostgreSQL + Auth + Realtime)
+- **Frontend**: React 18, TypeScript, TailwindCSS, Vite
+- **Backend**: Node.js, Express.js
+- **Database**: MongoDB (Mongoose)
 - **Packet Capture**: Python 3, Scapy
 - **Icons**: Lucide React
-- **Build Tool**: Vite
 
 ## Project Structure
 
-```
-/
-├── src/
-│   ├── components/         # Reusable UI components
-│   │   ├── Navbar.tsx
-│   │   ├── NetworkTrafficChart.tsx
-│   │   └── RecentAlerts.tsx
-│   ├── contexts/          # React context providers
-│   │   └── AuthContext.tsx
-│   ├── lib/               # Utilities and configurations
-│   │   └── supabase.ts
-│   ├── pages/             # Main application pages
-│   │   ├── Login.tsx
-│   │   ├── Dashboard.tsx
-│   │   ├── Logs.tsx
-│   │   ├── Alerts.tsx
-│   │   ├── Reports.tsx
-│   │   └── Settings.tsx
-│   └── App.tsx
-├── capture/               # Python packet analyzer
-│   ├── packet_analyzer.py
-│   ├── requirements.txt
-│   └── README.md
-└── README.md
-```
+/ ├── server/ # Node.js + Express Backend │ ├── models/ # Mongoose Models (User, Log, Alert, Report) │ └── index.js # Server entry point ├── src/ # React Frontend │ ├── components/ # Reusable UI components │ ├── contexts/ # React context providers │ ├── lib/ # Utilities (API client) │ ├── pages/ # Main application pages │ └── App.tsx ├── capture/ # Python packet analyzer │ ├── packet_analyzer.py │ ├── requirements.txt │ └── README.md └── README.md
+
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ and npm
-- Python 3.7+
-- Supabase account
+- **Node.js** 18+ and npm
+- **Python** 3.7+
+- **MongoDB** (Installed locally or using MongoDB Atlas)
 
 ### Installation
 
-1. **Clone and install dependencies**
-```bash
-npm install
-```
+1. **Install Frontend Dependencies**
+   ```bash
+   npm install
+Install Backend Dependencies
 
-2. **Install Python dependencies**
-```bash
+Bash
+
+# Create server directory if it doesn't exist, or navigate to it
+cd server
+npm install express mongoose cors dotenv bcryptjs jsonwebtoken
+cd ..
+Install Python Dependencies
+
+Bash
+
 cd capture
 pip install -r requirements.txt
 cd ..
-```
+Environment Setup
 
-3. **Environment Setup**
+Create a .env file in the root directory with the following configuration:
 
-The Supabase connection is already configured in `.env`. The database schema has been applied.
+Code snippet
 
-### Running the Application
+# Backend Configuration
+PORT=5000
+MONGODB_URI=mongodb://localhost:27017/netshield
+# Or for Atlas: mongodb+srv://<user>:<password>@cluster.mongodb.net/?appName=Cluster0
 
-1. **Start the web application**
-```bash
+# JWT Configuration
+JWT_SECRET=your_secure_random_secret_key
+
+# Frontend API Configuration (Vite handles VITE_ prefix)
+VITE_API_URL=http://localhost:5000
+Running the Application
+Start the Backend Server
+
+Bash
+
+node server/index.js
+You should see "Connected to MongoDB" in the console.
+
+Start the Frontend Application Open a new terminal:
+
+Bash
+
 npm run dev
-```
+Create an Account
 
-2. **Create an account**
-- Open the application in your browser
-- Sign up with email and password
-- Your account will be created automatically
+Open http://localhost:5173 in your browser.
 
-3. **Get your User ID** (Required for packet capture)
-- After logging in, open browser developer console (F12)
-- Go to Application → Local Storage
-- Find your Supabase session and copy your user ID
+Use the Sign Up form to create a new account.
 
-4. **Run packet analyzer**
-```bash
+Note: The first user does not automatically become an admin; you may need to update the role in the database directly for admin features.
+
+Get your User ID
+
+Log in to the dashboard.
+
+The packet analyzer needs your User ID to associate logs with your account.
+
+You can find this in your MongoDB users collection or potentially exposed in the frontend settings/profile view.
+
+Run Packet Analyzer
+
+Bash
+
 cd capture
-export USER_ID='your-user-id-from-step-3'
+# Replace with your actual User ID from MongoDB
+export USER_ID='65d4c...' 
+
+# Run with sudo (required for packet capture)
 sudo -E python3 packet_analyzer.py
-```
+Database Schema
+The application uses MongoDB collections:
 
-## Database Schema
+users: Stores user credentials, roles, and settings.
 
-### Tables
+packetlogs: Captured network packet data.
 
-- **user_profiles**: Extended user information and preferences
-- **packet_logs**: Captured network packet data
-- **alerts**: Security alerts and threats
-- **reports**: Generated security reports
+alerts: Security alerts and threats.
 
-### Row Level Security
+reports: Generated security reports.
 
-All tables have RLS enabled with policies ensuring:
-- Users can only access their own data
-- Admin users have full access
-- Proper authentication required for all operations
+Security Features
+Threat Detection
+Port Scanning: Detects when a single IP attempts to connect to multiple ports.
 
-## Security Features
+DoS Attacks: Identifies high-frequency packet floods.
 
-### Threat Detection
+Suspicious Access: Monitors access to commonly exploited ports.
 
-1. **Port Scanning**: Detects when a single IP attempts to connect to multiple ports
-2. **DoS Attacks**: Identifies high-frequency packet floods
-3. **Suspicious Access**: Monitors access to commonly exploited ports
+Authentication
+JWT Authentication: Secure stateless authentication using JSON Web Tokens.
 
-### Real-Time Updates
+Password Hashing: Bcrypt is used to hash passwords before storage.
 
-- WebSocket connections via Supabase Realtime
-- Live dashboard updates
-- Instant alert notifications
-- Automatic data synchronization
+Protected Routes: Middleware ensures only authenticated users access API endpoints.
 
-### Authentication
+Usage Guide
+Monitoring Network Activity
+Dashboard: Overview of network status and recent alerts.
 
-- Email/password authentication via Supabase Auth
-- Secure session management
-- Role-based access control
-- Protected routes
+Logs: Detailed packet information with filtering.
 
-## Usage Guide
+Alerts: Manage and respond to security threats.
 
-### First Time Setup
+Reports: Generate weekly security summaries.
 
-1. Sign up for an account
-2. Configure alert thresholds in Settings
-3. Start the packet analyzer with your User ID
-4. Monitor the dashboard for real-time activity
+Configuration
+Alert Thresholds (Configure in Settings page):
 
-### Monitoring Network Activity
+Low priority threshold: 1-50 alerts
 
-1. **Dashboard**: Overview of network status and recent alerts
-2. **Logs**: Detailed packet information with filtering
-3. **Alerts**: Manage and respond to security threats
-4. **Reports**: Generate weekly security summaries
+Medium priority threshold: 1-25 alerts
 
-### Responding to Threats
+High priority threshold: 1-10 alerts
 
-1. Review alert details in the Alerts page
-2. Mark alerts as "Investigating" while analyzing
-3. Take appropriate action (block IP, update firewall, etc.)
-4. Mark alerts as "Resolved" when complete
+Python Analyzer Settings (Edit capture/packet_analyzer.py):
 
-## Configuration
+API_URL: Ensure this points to http://localhost:5000/api/logs (or your configured port).
 
-### Alert Thresholds
+DOS_THRESHOLD: Packets before DoS alert (default: 100).
 
-Configure in Settings page:
-- Low priority threshold: 1-50 alerts
-- Medium priority threshold: 1-25 alerts
-- High priority threshold: 1-10 alerts
+PORT_SCAN_THRESHOLD: Ports before scan alert (default: 20).
 
-### Python Analyzer Settings
+API Integration
+The Python analyzer communicates with the Node.js backend via REST API:
 
-Edit `capture/packet_analyzer.py`:
-- `DOS_THRESHOLD`: Packets before DoS alert (default: 100)
-- `PORT_SCAN_THRESHOLD`: Ports before scan alert (default: 20)
-- `SUSPICIOUS_PORTS`: List of monitored ports
+HTTP
 
-## API Integration
-
-The Python analyzer communicates with Supabase via REST API:
-
-```python
-# Example: Log packet
-POST https://your-project.supabase.co/rest/v1/packet_logs
-Authorization: Bearer YOUR_ANON_KEY
+POST http://localhost:5000/api/logs
 Content-Type: application/json
+Authorization: Bearer <OPTIONAL_IF_IMPLEMENTED_FOR_BOTS>
 
 {
   "src_ip": "192.168.1.100",
@@ -230,117 +208,23 @@ Content-Type: application/json
   "protocol": "TCP",
   "packet_size": 1500,
   "status": "normal",
-  "user_id": "user-uuid"
+  "user_id": "user-mongo-object-id"
 }
-```
+Troubleshooting
+Connection Issues
+MongoDB Error: Ensure MongoDB service is running (sudo systemctl start mongod on Linux) or check your Atlas connection string in .env.
 
-## Performance
+IP Whitelist: If using MongoDB Atlas, ensure your current IP address is added to the Network Access whitelist.
 
-- Handles 1000+ packets/second
-- Real-time dashboard updates
-- Efficient database queries with indexes
-- Automatic data cleanup every 5 minutes
+Python Script Issues
+Permission denied: Packet capture requires root privileges. Run with sudo.
 
-## Deployment
+Connection Refused: Ensure the Node.js server is running on port 5000.
 
-### Frontend Deployment
+Frontend Issues
+Vite Error: Delete node_modules and package-lock.json, then run npm install again.
 
-Deploy to Vercel, Netlify, or Supabase:
+API Errors: Check the browser console and ensure VITE_API_URL is set correctly in .env.
 
-```bash
-npm run build
-# Deploy dist/ folder to your hosting service
-```
-
-### Python Analyzer as Service
-
-Run as systemd service on Ubuntu:
-
-```bash
-# Create service file
-sudo nano /etc/systemd/system/netshield.service
-
-# Add configuration
-[Unit]
-Description=Net Shield Packet Analyzer
-After=network.target
-
-[Service]
-Type=simple
-User=root
-WorkingDirectory=/path/to/project/capture
-Environment="USER_ID=your-user-id"
-ExecStart=/usr/bin/python3 packet_analyzer.py
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-
-# Enable and start
-sudo systemctl enable netshield
-sudo systemctl start netshield
-```
-
-## Troubleshooting
-
-### Python Script Issues
-
-- **Permission denied**: Run with `sudo`
-- **No packets captured**: Check network interface
-- **Database not updating**: Verify USER_ID is set
-
-### Frontend Issues
-
-- **Build errors**: Run `npm install` again
-- **Auth not working**: Check Supabase credentials
-- **No data showing**: Ensure packet analyzer is running
-
-## Future Enhancements
-
-- AI/ML-based threat detection
-- Email notifications via Supabase Functions
-- GeoIP location tracking
-- Advanced protocol analysis
-- Custom rule engine
-- Mobile app support
-- Multi-user collaboration features
-
-## Security Notes
-
-- This tool is for defensive security only
-- Only use on networks you own or have permission to monitor
-- Packet capture requires root privileges
-- All passwords are hashed and stored securely
-- RLS ensures data isolation between users
-
-## License
-
+License
 This project is for educational and defensive security purposes.
-
-## Support
-
-For issues or questions:
-1. Check the troubleshooting section
-2. Review the capture/README.md for Python-specific help
-3. Verify your Supabase configuration
-
-## Contributing
-
-When contributing:
-- Follow existing code style
-- Add tests for new features
-- Update documentation
-- Ensure security best practices
-
----
-
-Built with React, Supabase, and Python for comprehensive network security monitoring.
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
-=======
-# Minor-Project
->>>>>>> 963339ba749ec111174b38385d6d81af846b80b0
->>>>>>> 194a2bf62c7a4d140fa4a2d5580e5acf6d6add64
->>>>>>> 724a4b725d45f12383df23fb1e8279890f8bbccc
