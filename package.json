@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node ./node_modules/typescript/bin/tsc && vite build",
-    "postinstall": "node -e \"if (process.platform !== 'win32') { require('child_process').execSync('chmod +x ./node_modules/.bin/tsc'); }\"",
+    "build": "tsc && vite build",
+    "postinstall": "node -e \"if (process.platform !== 'win32') { try { require('child_process').execSync('chmod +x ./node_modules/.bin/* || true'); } catch(e) {} }\"",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "server": "node server/index.js"
