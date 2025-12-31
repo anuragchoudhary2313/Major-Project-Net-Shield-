@@ -22,7 +22,7 @@ export const Login: React.FC = () => {
         await signUp(email, password);
       }
     } catch (err: any) {
-      setError(err.message || 'An error occurred');
+      setError(err?.message || 'An error occurred');
     } finally {
       setLoading(false);
     }

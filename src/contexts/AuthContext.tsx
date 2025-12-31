@@ -31,15 +31,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { data } = await api.post('/auth/login', { email, password });
-    localStorage.setItem('token', data.token);
-    setUser(data.user);
+    try {
+      const { data } = await api.post('/auth/login', { email, password });
+      localStorage.setItem('token', data.token);
+      setUser(data.user);
+    } catch (err: any) {
+      const message = err?.response?.data?.error || err.message || 'Login failed';
+      throw new Error(message);
+    }
   };
 
   const signUp = async (email: string, password: string, role: 'admin' | 'analyst' | 'viewer' = 'viewer') => {
-    const { data } = await api.post('/auth/signup', { email, password, role });
-    localStorage.setItem('token', data.token);
-    setUser(data.user);
+    try {
+      const { data } = await api.post('/auth/signup', { email, password, role });
+      localStorage.setItem('token', data.token);
+      setUser(data.user);
+    } catch (err: any) {
+      const message = err?.response?.data?.error || err.message || 'Sign up failed';
+      throw new Error(message);
+    }
   };
 
   const signOut = () => {
