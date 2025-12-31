@@ -44,14 +44,20 @@ A comprehensive real-time network security analyzer that monitors, detects, and 
 - Role-based access control (Admin, Analyst, Viewer)
 - User profile management
 
+## 🌐 Live Deployment
+
+- **Frontend**: https://net-shield-security.vercel.app
+- **Backend API**: https://major-project-net-shield-backend.onrender.com
+
 ## 🛠️ Tech Stack
 
 - **Frontend**: React 18, TypeScript, TailwindCSS, Vite
 - **Backend**: Node.js, Express
-- **Database**: MongoDB
+- **Database**: MongoDB Atlas
 - **Packet Capture**: Python 3, Scapy
 - **Icons**: Lucide React
 - **Build Tool**: Vite
+- **Deployment**: Vercel (Frontend), Render (Backend)
 
 ## 📁 Project Structure
 
