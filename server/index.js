@@ -13,7 +13,15 @@ import { Report } from './models/Report.js';
 dotenv.config({ path: '../.env' });
 
 const app = express();
-app.use(cors());
+
+// CORS configuration for production
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || '*',
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
@@ -196,4 +204,16 @@ app.post('/api/reports/generate', authenticate, async (req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Health check endpoint for Render
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    message: 'NetShield API is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+});
